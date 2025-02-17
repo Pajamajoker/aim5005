@@ -2,6 +2,14 @@ import numpy as np
 from typing import List, Tuple
 ### YOU MANY NOT ADD ANY MORE IMPORTS (you may add more typing imports)
 
+# Attribution dictionary
+REFERENCES = {
+    "LabelEncoder.transform": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html",
+    "StandardScaler.transform": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html",
+    "LabelEncoder.np.searchSorted": "https://numpy.org/doc/2.1/reference/generated/numpy.searchsorted.html",
+    "StandardScalar.divide_by_zero": "https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#:~:text=If%20a%20variance%20is%20zero%2C%20we%20can%E2%80%99t%20achieve%20unit%20variance%2C%20and%20the%20data%20is%20left%20as%2Dis%2C%20giving%20a%20scaling%20factor%20of%201."
+}
+
 class MinMaxScaler:
     def __init__(self):
         self.minimum = None
