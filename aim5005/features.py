@@ -33,9 +33,10 @@ class LabelEncoder:
     def __init__(self):
         self.classes_ = None
 
-    def _check_is_array(self, y):
+    def _check_is_array(self, y: np.ndarray) -> np.ndarray:
         if not isinstance(y, np.ndarray):
             y = np.array(y)
+        assert isinstance(y, np.ndarray), "Expected the input to be a list"
         return y
 
     def fit(self, y):
@@ -56,11 +57,45 @@ class LabelEncoder:
         unseen = np.setdiff1d(y, self.classes_)
         if len(unseen) > 0:
             raise ValueError(f"y contains previously unseen labels: {unseen.tolist()}")
+
+        """
+        I have used np.searchsorted(self.classes_, y) which essentially maps each label in y to its index in self.classes_
+        Since self.classes_ is sorted (from np.unique in fit), this converts labels to integers like 0, 1, 2, ....
+        Example:
+        If self.classes_ = [1, 2, 6] (from fit([1, 2, 2, 6])), then:
+        transform([1, 1, 2, 6]) returns [0, 0, 1, 2].
+        """
+
         return np.searchsorted(self.classes_, y)
 
     def fit_transform(self, y):
         return self.fit(y).transform(y)
 
 class StandardScaler:
+    # def __init__(self):
+        # raise NotImplementedError
     def __init__(self):
-        raise NotImplementedError
+        self.mean = None
+        self.scale = None  # Standard deviation (sigma)
+        
+    def _check_is_array(self, x: np.ndarray) -> np.ndarray:
+        if not isinstance(x, np.ndarray):
+            x = np.array(x)
+        assert isinstance(x, np.ndarray), "Expected the input to be a list"
+        return x
+        
+    def fit(self, x: np.ndarray) -> None:
+        x = self._check_is_array(x)
+        self.mean = np.mean(x, axis=0)
+        self.scale = np.std(x, axis=0, ddof=0)  # Population std
+        
+    def transform(self, x: np.ndarray) -> np.ndarray:
+        x = self._check_is_array(x)
+        if self.mean is None or self.scale is None:
+            raise ValueError("StandardScaler has not been fitted yet.")
+        return (x - self.mean) / self.scale
+    
+    def fit_transform(self, x: np.ndarray) -> np.ndarray:
+        x = self._check_is_array(x)
+        self.fit(x)
+        return self.transform(x)

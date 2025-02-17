@@ -62,7 +62,15 @@ class TestFeatures(TestCase):
         result = scaler.transform([[2., 2.]]) 
         assert (result == expected).all(), "Scaler transform does not return expected values. Expect {}. Got: {}".format(expected.reshape(1,-1), result.reshape(1,-1))
 
-    # TODO: Add a test of your own below this line
+    # Custom test case for StandardSCalar:
+    def test_standard_scaler_zero_mean_unit_variance(self):
+        data = np.array([[1, 2], [3, 4], [5, 6]])
+        scaler = StandardScaler()
+        transformed = scaler.fit_transform(data)
+        # Check zero mean
+        assert np.allclose(transformed.mean(axis=0), [0.0, 0.0]), "Transformed data does not have zero mean"
+        # Check unit variance (population std)
+        assert np.allclose(transformed.std(axis=0, ddof=0), [1.0, 1.0]), "Transformed data does not have unit variance"
 
     # Test cases for LabelEncoder
     def test_label_encoder_numeric_labels(self):
