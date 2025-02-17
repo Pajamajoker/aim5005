@@ -37,6 +37,11 @@ class LabelEncoder:
         if not isinstance(y, np.ndarray):
             y = np.array(y)
         assert isinstance(y, np.ndarray), "Expected the input to be a list"
+
+        # Check for empty array
+        if y.size == 0:
+            raise ValueError("Input array is empty.")
+        
         return y
 
     def fit(self, y):
@@ -82,6 +87,11 @@ class StandardScaler:
         if not isinstance(x, np.ndarray):
             x = np.array(x)
         assert isinstance(x, np.ndarray), "Expected the input to be a list"
+
+        # Check for empty array
+        if x.size == 0:
+            raise ValueError("Input array is empty.")
+
         return x
         
     def fit(self, x: np.ndarray) -> None:
@@ -93,7 +103,14 @@ class StandardScaler:
         x = self._check_is_array(x)
         if self.mean is None or self.scale is None:
             raise ValueError("StandardScaler has not been fitted yet.")
-        return (x - self.mean) / self.scale
+        
+        # Handle zero standard deviation during transformation
+        if isinstance(self.scale, np.ndarray):  # Multiple features
+            scale_safe = np.array([1.0 if s == 0 else s for s in self.scale])
+        else:  # Single feature
+            scale_safe = 1.0 if self.scale == 0 else self.scale
+
+        return (x - self.mean) / scale_safe
     
     def fit_transform(self, x: np.ndarray) -> np.ndarray:
         x = self._check_is_array(x)

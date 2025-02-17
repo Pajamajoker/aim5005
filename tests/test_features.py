@@ -63,6 +63,19 @@ class TestFeatures(TestCase):
         assert (result == expected).all(), "Scaler transform does not return expected values. Expect {}. Got: {}".format(expected.reshape(1,-1), result.reshape(1,-1))
 
     # Custom test case for StandardSCalar:
+
+    def test_standard_scaler_1d_input(self):
+        """Test StandardScaler with 1D input data."""
+        data = [1, 2, 3, 4]
+        scaler = StandardScaler()
+        scaler.fit(data)
+        expected_mean = np.mean(data)
+        expected_std = np.std(data, ddof=0)
+        assert scaler.mean == expected_mean and scaler.scale == expected_std, "1D fit incorrect"
+        result = scaler.transform([5])
+        expected = (5 - expected_mean) / expected_std
+        assert np.allclose(result, expected), "1D transform incorrect"
+
     def test_standard_scaler_zero_mean_unit_variance(self):
         data = np.array([[1, 2], [3, 4], [5, 6]])
         scaler = StandardScaler()
@@ -72,7 +85,30 @@ class TestFeatures(TestCase):
         # Check unit variance (population std)
         assert np.allclose(transformed.std(axis=0, ddof=0), [1.0, 1.0]), "Transformed data does not have unit variance"
 
-    # Test cases for LabelEncoder
+    def test_standard_scaler_zero_variance(self):
+        """Test StandardScaler with a feature having zero variance (all values same)."""
+        data = [[2], [2], [2]]  # All values are the same (zero variance)
+        scaler = StandardScaler()
+        scaler.fit(data)
+        result = scaler.transform(data)
+        
+        # Expected result: All values should be 0 after centering (mean subtraction)
+        expected_result = np.array([[0], [0], [0]])
+        
+        # Check if the result matches the expected result
+        assert np.allclose(result, expected_result), "Zero variance should result in 0 after centering"
+        
+        # Test cases for LabelEncoder
+    
+    def test_label_encoder_single_class(self):
+        """Test LabelEncoder with all labels being the same."""
+        le = LabelEncoder()
+        y = [5, 5, 5]
+        le.fit(y)
+        assert np.array_equal(le.classes_, [5]), "Single class fit failed"
+        result = le.transform([5, 5])
+        assert np.array_equal(result, [0, 0]), "Single class transform failed"
+        
     def test_label_encoder_numeric_labels(self):
         le = LabelEncoder()
         y = [1, 2, 2, 6]
